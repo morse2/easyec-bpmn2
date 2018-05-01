@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.googlecode.easyec.bpmn2.dao.CommentDao">
+    <resultMap id="BaseResultMap" type="com.googlecode.easyec.bpmn2.domain.impl.CommentEntity">
+        <id column="ID_" jdbcType="VARCHAR" property="id"/>
+        <result column="ROLE_" jdbcType="VARCHAR" property="role"/>
+        <result column="ROLE_ACT_" jdbcType="VARCHAR" property="roleAction"/>
+        <result column="SYSTEM_" jdbcType="SMALLINT" property="system"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        UIDPK_, ROLE_, ROLE_ACT_, SYSTEM_
+    </sql>
+    <sql id="Combine_Column_List">
+        hc.ID_, hc.TYPE_, hc.TIME_, hc.USER_ID_, hc.TASK_ID_, hc.PROC_INST_ID_,
+        hc.ACTION_, hc.FULL_MSG_, bc.ROLE_, bc.ROLE_ACT_, bc.SYSTEM_
+    </sql>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from T_BP_COMMENT
+        where UIDPK_ = #{uidPk,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.googlecode.easyec.bpmn2.domain.impl.CommentEntity">
+        insert into T_BP_COMMENT (UIDPK_, ROLE_, ROLE_ACT_, SYSTEM_)
+        values (#{id,jdbcType=VARCHAR}, #{role,jdbcType=VARCHAR},
+        #{roleAction,jdbcType=VARCHAR}, #{system,jdbcType=SMALLINT})
+    </insert>
+
+    <select id="find" parameterType="hashmap" resultMap="BaseResultMap">
+        select
+        <include refid="Combine_Column_List"/>
+        from ACT_HI_COMMENT hc
+        join T_BP_COMMENT bc on hc.ID_ = bc.UIDPK_
+        <if test="procId != null">
+            join T_BP_PROCESS bp on hc.PROC_INST_ID_ = bp.PROC_INST_ID_
+        </if>
+        <where>
+            <if test="taskId != null">
+                and hc.TASK_ID_ = #{taskId,jdbcType=VARCHAR}
+            </if>
+            <if test="userId != null">
+                and hc.USER_ID_ = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="type != null">
+                and hc.TYPE_ = #{type,jdbcType=VARCHAR}
+            </if>
+            <if test="system != null">
+                and bc.SYSTEM_ = #{system,jdbcType=SMALLINT}
+            </if>
+            <if test="procId != null">
+                and bp.UIDPK_ = #{procId,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by hc.TIME_ desc
+    </select>
+</mapper>

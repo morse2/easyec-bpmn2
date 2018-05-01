@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:caching="http://easyec.googlecode.com/schema/caching"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://easyec.googlecode.com/schema/caching
+        http://easyec.googlecode.com/schema/caching/cache.xsd"
+       default-lazy-init="true">
+
+    <!-- 缓存服务类 -->
+    <caching:service>
+        <caching:simple>
+            <caching:dynamic-cache/>
+        </caching:simple>
+    </caching:service>
+</beans>

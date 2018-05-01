@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.tnt.com.cn/webpos">
+  <message id="raiseToManager" name="Raise To Manager"></message>
+  <process id="quote_flow" name="Quotation Flow" isExecutable="true">
+    <startEvent id="start" name="Start Quotation Process"></startEvent>
+    <userTask id="qdTask" name="QD Task" activiti:assignee="${myService.getQD(processId)}"></userTask>
+    <sequenceFlow id="f_1" sourceRef="start" targetRef="qdTask"></sequenceFlow>
+    <userTask id="qdm_task" name="QD Manager" activiti:assignee="${myService.getQDManager(processId)}"></userTask>
+    <userTask id="rm_task" name="Region Manager" activiti:assignee="${myService.getRM(processId)}"></userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="f_2" sourceRef="qdTask" targetRef="endevent1"></sequenceFlow>
+    <boundaryEvent id="bm_1" name="Raise To Manager Message" attachedToRef="qdTask" cancelActivity="false">
+      <messageEventDefinition messageRef="raiseToManager"></messageEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="f_3" sourceRef="bm_1" targetRef="qdm_task"></sequenceFlow>
+    <exclusiveGateway id="gw_1" name="Does QD Manager Approved?" default="f_5_N"></exclusiveGateway>
+    <sequenceFlow id="f_4" sourceRef="qdm_task" targetRef="gw_1"></sequenceFlow>
+    <exclusiveGateway id="gw_2" name="Should RM Approve?" default="f_6_N"></exclusiveGateway>
+    <sequenceFlow id="f_5_Y" name="Y" sourceRef="gw_1" targetRef="gw_2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="f_5_N" sourceRef="gw_1" targetRef="endevent2"></sequenceFlow>
+    <sequenceFlow id="f_6_Y" sourceRef="gw_2" targetRef="rm_task">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${myService.shouldRMApprove(processId)}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f_6_N" sourceRef="gw_2" targetRef="endevent2"></sequenceFlow>
+    <sequenceFlow id="f_7" sourceRef="rm_task" targetRef="endevent2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_quote_flow">
+    <bpmndi:BPMNPlane bpmnElement="quote_flow" id="BPMNPlane_quote_flow">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="180.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="qdTask" id="BPMNShape_qdTask">
+        <omgdc:Bounds height="55.0" width="105.0" x="300.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bm_1" id="BPMNShape_bm_1">
+        <omgdc:Bounds height="30.0" width="30.0" x="338.0" y="254.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="qdm_task" id="BPMNShape_qdm_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="300.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rm_task" id="BPMNShape_rm_task">
+        <omgdc:Bounds height="55.0" width="105.0" x="475.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="493.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gw_1" id="BPMNShape_gw_1">
+        <omgdc:Bounds height="40.0" width="40.0" x="332.0" y="440.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gw_2" id="BPMNShape_gw_2">
+        <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="440.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="423.0" y="530.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="f_1" id="BPMNEdge_f_1">
+        <omgdi:waypoint x="215.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_2" id="BPMNEdge_f_2">
+        <omgdi:waypoint x="405.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="493.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_3" id="BPMNEdge_f_3">
+        <omgdi:waypoint x="353.0" y="284.0"></omgdi:waypoint>
+        <omgdi:waypoint x="352.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_4" id="BPMNEdge_f_4">
+        <omgdi:waypoint x="352.0" y="395.0"></omgdi:waypoint>
+        <omgdi:waypoint x="352.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_5_Y" id="BPMNEdge_f_5_Y">
+        <omgdi:waypoint x="372.0" y="460.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="460.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="375.0" y="450.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_5_N" id="BPMNEdge_f_5_N">
+        <omgdi:waypoint x="352.0" y="480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="352.0" y="547.0"></omgdi:waypoint>
+        <omgdi:waypoint x="423.0" y="547.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_6_Y" id="BPMNEdge_f_6_Y">
+        <omgdi:waypoint x="440.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="367.0"></omgdi:waypoint>
+        <omgdi:waypoint x="475.0" y="367.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_6_N" id="BPMNEdge_f_6_N">
+        <omgdi:waypoint x="440.0" y="480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="530.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f_7" id="BPMNEdge_f_7">
+        <omgdi:waypoint x="527.0" y="395.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="547.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="547.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
+
+    <bean id="processEngineConfiguration"
+          class="org.activiti.spring.SpringProcessEngineConfiguration"
+          p:activityBehaviorFactory-ref="activityBehaviorFactory"
+          p:transactionManager-ref="transactionManager"
+          p:eventListeners-ref="eventListeners"
+          p:createDiagramOnDeploy="false"
+          p:dataSource-ref="dataSource"
+    />
+
+    <bean id="processEngine"
+          class="org.activiti.spring.ProcessEngineFactoryBean"
+          p:processEngineConfiguration-ref="processEngineConfiguration"
+    />
+
+    <bean id="activityBehaviorFactory"
+          class="com.googlecode.easyec.bpmn2.engine.bpmn.parser.factory.AdvancedActivityBehaviorFactory"
+    />
+
+    <util:list id="eventListeners" list-class="java.util.ArrayList">
+        <bean class="com.googlecode.easyec.bpmn2.engine.delegate.event.ProcessLifecycleEventListener"
+              p:flowStdService-ref="flowStdService"
+        />
+    </util:list>
+
+    <!-- 配置Activiti框架的业务类 -->
+    <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
+    <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService"/>
+    <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService"/>
+    <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
+    <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService"/>
+    <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService"/>
+    <bean id="formService" factory-bean="processEngine" factory-method="getFormService"/>
+
+    <bean id="myService"
+          class="com.googlecode.easyec.bpmn2.service.impl.MyServiceImpl"/>
+
+    <bean id="flowStdService"
+          class="com.googlecode.easyec.bpmn2.service.impl.FlowStdServiceImpl"/>
+</beans>
