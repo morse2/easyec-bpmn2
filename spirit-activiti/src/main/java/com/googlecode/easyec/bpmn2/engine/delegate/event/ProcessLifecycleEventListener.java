@@ -17,6 +17,10 @@ public class ProcessLifecycleEventListener extends AbstractProcessEventListener 
         this.flowStdService = flowStdService;
     }
 
+    public FlowStdService getFlowStdService() {
+        return flowStdService;
+    }
+
     @Override
     protected void onStarted(ActivitiProcessStartedEvent event) {
         flowStdService.makeAsStarted(
@@ -29,14 +33,14 @@ public class ProcessLifecycleEventListener extends AbstractProcessEventListener 
 
     @Override
     protected void onCancelled(ActivitiCancelledEvent event) {
-        flowStdService.makeAsCancelled(_getProcessId(event));
+        flowStdService.makeAsCancelled(getProcessId(event));
         logger.info("Process is cancelled. Instance id: [{}].",
             event.getProcessInstanceId());
     }
 
     @Override
     protected void onCompleted(ActivitiEvent event) {
-        flowStdService.makeAsFinished(_getProcessId(event));
+        flowStdService.makeAsFinished(getProcessId(event));
         logger.info("Process [{}] is completed.",
             event.getProcessInstanceId());
     }
@@ -46,7 +50,13 @@ public class ProcessLifecycleEventListener extends AbstractProcessEventListener 
         Assert.notNull(flowStdService, "FlowStdService cannot be null.");
     }
 
-    private String _getProcessId(ActivitiEvent event) {
+    /**
+     * 获取流程对象的ID
+     *
+     * @param event <code>ActivitiEvent</code>
+     * @return Process ID
+     */
+    protected String getProcessId(ActivitiEvent event) {
         return (String) event.getEngineServices()
             .getRuntimeService()
             .getVariable(
